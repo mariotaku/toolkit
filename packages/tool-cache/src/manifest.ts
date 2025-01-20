@@ -5,6 +5,7 @@ import {debug} from '@actions/core'
 /* eslint @typescript-eslint/no-require-imports: 0 */
 
 import os = require('os')
+import process = require('process')
 import cp = require('child_process')
 import fs = require('fs')
 
@@ -151,11 +152,14 @@ export function _getOsVersion(): string {
 }
 
 export function _readLinuxVersionFile(): string {
+  const osReleaseEnv = process.env['LSB_OS_RELEASE']
   const lsbReleaseFile = '/etc/lsb-release'
   const osReleaseFile = '/etc/os-release'
   let contents = ''
 
-  if (fs.existsSync(lsbReleaseFile)) {
+  if (osReleaseEnv && fs.existsSync(osReleaseEnv)) {
+    contents = fs.readFileSync(osReleaseEnv).toString()
+  } else if (fs.existsSync(lsbReleaseFile)) {
     contents = fs.readFileSync(lsbReleaseFile).toString()
   } else if (fs.existsSync(osReleaseFile)) {
     contents = fs.readFileSync(osReleaseFile).toString()
